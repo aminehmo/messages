@@ -11,14 +11,16 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import firebase from "@firebase/app";
 import "@firebase/firestore";
+import firebase from "@firebase/app";
+import "firebase/auth";
+
 import db from "../db.js";
 
 //this will excute one time , it will be placed before the render
 export default function HomeScreen() {
   const [messages, setMessages] = useState([]);
-  const [from, setFrom] = React.useState("");
+  // const [from, setFrom] = React.useState("");
   const [to, setTo] = React.useState("");
   const [text, setText] = React.useState("");
   const [id, setId] = React.useState("");
@@ -36,6 +38,11 @@ export default function HomeScreen() {
       setMessages([...messages]);
     });
   }, []);
+
+  useEffect(() => {
+    console.log("auth", firebase.auth());
+  }, []);
+
   const handleDelete = message => {
     // it will find the id of the specific messege that we want to delete
     db.collection("messages")
@@ -43,6 +50,8 @@ export default function HomeScreen() {
       .delete();
   };
   const handleSend = () => {
+    const from = firebase.auth().currentUser.uid;
+
     // it checks that if the id messege is there that means that its being update
     if (id) {
       db.collection("messages")
@@ -55,14 +64,14 @@ export default function HomeScreen() {
     }
     //if the message is new it will empty the from and to and text so it wont be updating anymore
     //creating from scratch
-    setFrom("");
+    // setFrom("");
     setTo("");
     setText("");
     setId("");
   };
   //it will take the message object and show them all in the fiels for editing
   const handleEdit = message => {
-    setFrom(message.from);
+    // setFrom(message.from);
     setTo(message.to);
     setText(message.text);
     setId(message.id);
@@ -81,7 +90,8 @@ export default function HomeScreen() {
             }}
           >
             <Text style={styles.getStartedText} key={i}>
-              {message.id} ... {message.text}
+              {console.log('qwq', message)}
+              {message.from} : {message.to}  {message.text}
             </Text>
             <View
               style={{
@@ -111,7 +121,7 @@ export default function HomeScreen() {
           </View>
         ))}
       </ScrollView>
-      <TextInput
+      {/* <TextInput
         style={{
           height: 30,
           borderColor: "black",
@@ -122,7 +132,7 @@ export default function HomeScreen() {
         onChangeText={setFrom}
         placeholder="From"
         value={from}
-      />
+      /> */}
       <TextInput
         style={{
           height: 30,
