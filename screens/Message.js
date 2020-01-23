@@ -1,79 +1,62 @@
+import * as WebBrowser from "expo-web-browser";
 import React, { useState, useEffect } from "react";
-import { ExpoConfigView } from "@expo/samples";
+import {
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  Button,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+import "@firebase/firestore";
 import firebase from "@firebase/app";
 import "firebase/auth";
-import {
-  View,
-  Platform,
-  Text,
-  ScrollView,
-  Button,
-  StyleSheet,
-  TextInput
-} from "react-native";
-import db from "../db";
+import "firebase/database";
+import db from "../db.js";
 
-export default function SettingsScreen() {
-  const [displayName, setDisplayName] = useState("");
-  const [photoURL, setphotoURL] = useState("");
-  const handleSet = async () => {
+export default ({ message, handleEdit }) => {
+  const [from, setFrom] = useState(null);
+
+  handleSet = async () => {
     const info = await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.get());
-    setDisplayName(info.displayName);
-    setphotoURL(info.photoURL);
+      .collection(`users`)
+      .doc(message.from)
+      .get(snapShot => {
+        console.log("message.from info ", snapShot.data());
+      });
   };
   useEffect(() => {
-    // setDisplayName(firebase.auth().currentUser.displayName);
-    // setphotoURL(firebase.auth().currentUser.photoURL);
     handleSet();
   }, []);
-  const handleSave = () => {
-    // firebase.auth().currentUser.updateProfile({
-    //   displayName,
-    //   photoURL
-    // });
-    db.collection("users").doc(
-      firebase.auth().currentUser.uid.update({ displayName, photoURL })
-    );
+  const handleDelete = message => {
+    // it will find the id of the specific messege that we want to delete
+    db.collection("messages")
+      .doc(message.id)
+      .delete();
   };
   return (
-    <View style={styles.container}>
-      <Text>hey</Text>
-
-      <TextInput
+    <>
+      <Text style={styles.getStartedText}>
+        {message.from} : {message.to} {message.text}
+      </Text>
+      <View
         style={{
-          height: 30,
-          borderColor: "black",
+          backgroundColor: "#e6f9ff",
+          flexDirection: "column",
+          justifyContent: "space-evenly",
           borderTopWidth: 1,
-          fontSize: 24,
           borderBottomWidth: 0.5,
-          backgroundColor: "white"
+          borderColor: "black"
         }}
-        onChangeText={setDisplayName}
-        placeholder="Name"
-        value={displayName}
-      />
-      <TextInput
-        style={{
-          height: 30,
-          borderColor: "black",
-          borderTopWidth: 1,
-          fontSize: 24,
-          borderBottomWidth: 0.5,
-          backgroundColor: "white"
-        }}
-        onChangeText={setphotoURL}
-        placeholder="Photo URL"
-        value={photoURL}
-      />
-      <Button title="Save" onPress={() => handleSave()} />
-    </View>
+      >
+        <Button title="Edit" onPress={() => handleEdit(message)} />
+        <Button title="Delete" onPress={() => handleDelete(message)} />
+      </View>
+    </>
   );
-}
-
-SettingsScreen.navigationOptions = {
-  title: "Settings"
 };
 const styles = StyleSheet.create({
   container: {

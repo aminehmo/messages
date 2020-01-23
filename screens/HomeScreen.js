@@ -14,6 +14,7 @@ import {
 import "@firebase/firestore";
 import firebase from "@firebase/app";
 import "firebase/auth";
+import Message from "./Message";
 
 import db from "../db.js";
 
@@ -43,12 +44,6 @@ export default function HomeScreen() {
     console.log("auth", firebase.auth());
   }, []);
 
-  const handleDelete = message => {
-    // it will find the id of the specific messege that we want to delete
-    db.collection("messages")
-      .doc(message.id)
-      .delete();
-  };
   const handleSend = () => {
     const from = firebase.auth().currentUser.uid;
 
@@ -70,11 +65,21 @@ export default function HomeScreen() {
     setId("");
   };
   //it will take the message object and show them all in the fiels for editing
+
+  const handleLogout = () => {
+    firebase.auth().signOut();
+  };
   const handleEdit = message => {
-    // setFrom(message.from);
     setTo(message.to);
     setText(message.text);
     setId(message.id);
+  };
+
+  const handleDelete = message => {
+    // it will find the id of the specific messege that we want to delete
+    db.collection("messages")
+      .doc(message.id)
+      .delete();
   };
   return (
     <View style={styles.container}>
@@ -82,57 +87,10 @@ export default function HomeScreen() {
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         keyboardShouldPersistTaps="always"
-      >
-        {messages.map((message, i) => (
-          <View
-            style={{
-              width: "100%"
-            }}
-          >
-            <Text style={styles.getStartedText} key={i}>
-              {console.log('qwq', message)}
-              {message.from} : {message.to}  {message.text}
-            </Text>
-            <View
-              style={{
-                backgroundColor: "#e6f9ff",
-                flexDirection: "column",
-                justifyContent: "space-evenly",
-                borderTopWidth: 1,
-                borderBottomWidth: 0.5,
-                borderColor: "black"
-              }}
-            >
-              <Button title="Edit" onPress={() => handleEdit(message)} />
-            </View>
-            <View
-              style={{
-                backgroundColor: "#e6f9ff",
-                flexDirection: "column",
-                justifyContent: "space-evenly",
-                borderTopWidth: 0.5,
-                borderBottomWidth: 1,
-
-                borderColor: "black"
-              }}
-            >
-              <Button title="Delete" onPress={() => handleDelete(message)} />
-            </View>
-          </View>
-        ))}
-      </ScrollView>
-      {/* <TextInput
-        style={{
-          height: 30,
-          borderColor: "black",
-          borderTopWidth: 1,
-          borderBottomWidth: 0.5,
-          backgroundColor: "white"
-        }}
-        onChangeText={setFrom}
-        placeholder="From"
-        value={from}
-      /> */}
+      ></ScrollView>
+      {messages.map((message, i) => (
+        <Message key={i} message={message} handleEdit={handleEdit} />
+      ))}
       <TextInput
         style={{
           height: 30,
@@ -165,7 +123,8 @@ export default function HomeScreen() {
           borderBottomWidth: 0.5
         }}
       >
-        <Button title="send" onPress={() => handleSend()} />
+        <Button title="Send" onPress={() => handleSend()} />
+        <Button title="Log Out" onPress={() => handleLogout()} />
       </View>
     </View>
   );

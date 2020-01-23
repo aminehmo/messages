@@ -15,6 +15,7 @@ import firebase from "@firebase/app";
 import "firebase/auth";
 
 import AppNavigator from "./navigation/AppNavigator";
+import db from "./db";
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -26,8 +27,11 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setUser);
   }, []);
 
-  const handleRegister = () => {
-    firebase.auth().createUserWithEmailAndPassword(email, password);
+  const handleRegister = async () => {
+    await firebase.auth().createUserWithEmailAndPassword(email, password);
+    db.collection(`users`)
+      .doc(firebase.auth().currentUser.uid)
+      .add({ displayName: "", photoUrl: "" });
   };
   const handleLogin = () => {
     firebase.auth().signInWithEmailAndPassword(email, password);
