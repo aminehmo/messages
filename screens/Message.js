@@ -25,7 +25,7 @@ export default ({ message, handleEdit }) => {
       .collection(`users`)
       .doc(message.from)
       .get();
-    // console.log("message.from info ", snap.data());
+    console.log("message.from info ", message, snap.data());
     setUser(snap.data());
   };
   useEffect(() => {
@@ -37,6 +37,8 @@ export default ({ message, handleEdit }) => {
       .doc(message.id)
       .delete();
   };
+  console.log("message0000000", message);
+
   return (
     user && (
       <>

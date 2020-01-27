@@ -88,9 +88,10 @@ export default function HomeScreen() {
         contentContainerStyle={styles.contentContainer}
         keyboardShouldPersistTaps="always"
       ></ScrollView>
-      {messages.map((message, i) => (
-        <Message key={i} message={message} handleEdit={handleEdit} />
-      ))}
+      {messages.map((message, i) => {
+        console.log("msg....", i, message);
+        return <Message key={i} message={message} handleEdit={handleEdit} />;
+      })}
       <TextInput
         style={{
           height: 30,
