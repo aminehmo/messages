@@ -12,24 +12,24 @@ import {
   View
 } from "react-native";
 import "@firebase/firestore";
-import firebase from "@firebase/app";
-import "firebase/auth";
-import "firebase/database";
+// import firebase from "@firebase/app";
+// import "firebase/auth";
+// import "firebase/database";
 import db from "../db.js";
 
 export default ({ message, handleEdit }) => {
-  const [from, setFrom] = useState(null);
+  const [user, setUser] = useState(null);
 
-  handleSet = async () => {
-    const info = await db
+  handleUser = async () => {
+    const snap = await db
       .collection(`users`)
       .doc(message.from)
-      .get(snapShot => {
-        console.log("message.from info ", snapShot.data());
-      });
+      .get();
+    // console.log("message.from info ", snap.data());
+    setUser(snap.data());
   };
   useEffect(() => {
-    handleSet();
+    handleUser();
   }, []);
   const handleDelete = message => {
     // it will find the id of the specific messege that we want to delete
@@ -38,24 +38,38 @@ export default ({ message, handleEdit }) => {
       .delete();
   };
   return (
-    <>
-      <Text style={styles.getStartedText}>
-        {message.from} : {message.to} {message.text}
-      </Text>
-      <View
-        style={{
-          backgroundColor: "#e6f9ff",
-          flexDirection: "column",
-          justifyContent: "space-evenly",
-          borderTopWidth: 1,
-          borderBottomWidth: 0.5,
-          borderColor: "black"
-        }}
-      >
-        <Button title="Edit" onPress={() => handleEdit(message)} />
-        <Button title="Delete" onPress={() => handleDelete(message)} />
-      </View>
-    </>
+    user && (
+      <>
+        <View>
+          <Image
+            style={{
+              width: 70,
+              height: 70,
+              borderWidth: 3,
+              borderColor: "black"
+            }}
+            source={{ uri: user.photoURL }}
+          />
+          <Text style={styles.getStartedText}>
+            {user.displayName} : {message.to} {message.text}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            backgroundColor: "#e6f9ff",
+            flexDirection: "column",
+            justifyContent: "space-evenly",
+            borderTopWidth: 1,
+            borderBottomWidth: 0.5,
+            borderColor: "black"
+          }}
+        >
+          <Button title="Edit" onPress={() => handleEdit(message)} />
+          <Button title="Delete" onPress={() => handleDelete(message)} />
+        </View>
+      </>
+    )
   );
 };
 const styles = StyleSheet.create({
